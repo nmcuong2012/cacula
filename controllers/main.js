@@ -16,6 +16,7 @@ function createProduct() {
   let product = {
     name: getElement("#TenSP").value,
     price: +getElement("#GiaSP").value,
+    date: getElement("#date").value,
   };
 
   // Gọi API thêm sản phẩm
@@ -42,6 +43,7 @@ function deleteProduct(productId) {
       return apiGetProducts();
     })
     .then((response) => {
+      alert("Trả nợ thành công");
       display(response.data);
     })
     .catch((error) => {
@@ -53,7 +55,7 @@ function selectProduct(productId) {
   // Hiển thị modal
   $("#myModal").modal("show");
   // Hiển thị title và footer của modal
-  getElement(".modal-title").innerHTML = "Cập nhật sản phẩm";
+  getElement(".modal-title").innerHTML = "Cập nhật người nợ";
   getElement(".modal-footer").innerHTML = `
     <button class="btn btn-secondary" data-dismiss="modal">Huỷ</button>
     <button class="btn btn-success" onclick="updateProduct('${productId}')">Cập nhật</button>
@@ -65,6 +67,7 @@ function selectProduct(productId) {
       let product = response.data;
       getElement("#TenSP").value = product.name;
       getElement("#GiaSP").value = product.price;
+      getElement("#date").value = product.date;
     })
     .catch((error) => {
       console.log(error);
@@ -76,6 +79,7 @@ function updateProduct(productId) {
   let newProduct = {
     name: getElement("#TenSP").value,
     price: +getElement("#GiaSP").value,
+    date: getElement("#date").value,
   };
 
   apiUpdateProduct(productId, newProduct)
@@ -86,6 +90,7 @@ function updateProduct(productId) {
     .then((response) => {
       display(response.data);
       $("#myModal").modal("hide");
+      alert("Chỉnh sửa thành công");
     })
     .catch((error) => {
       console.log(error);
@@ -94,24 +99,27 @@ function updateProduct(productId) {
 
 function display(products) {
   let html = products.reduce((result, value, index) => {
-    let product = new Product(value.id, value.name, value.price);
-    let priceVND = product.price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
+    let product = new Product(value.id, value.name, value.price, value.date);
+    let priceVND = value.price
+      ? value.price.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        })
+      : "";
     return (
       result +
       `
         <tr>
-          <td>${index + 1}</td>
+         <td>${index + 1}</td>
           <td>${product.name}</td>
           <td>${priceVND}</td>
+          <td>${product.date}</td>
           <td>
             <button
               class="btn btn-primary"
               onclick="selectProduct('${product.id}')"
             >
-              Cập nhật số tiền
+              Cập nhật
             </button>
             <button
               class="btn btn-danger"
@@ -127,10 +135,9 @@ function display(products) {
 
   document.getElementById("tblDanhSachSP").innerHTML = html;
 }
-
 // ======= DOM =======
 getElement("#btnThemSP").onclick = () => {
-  getElement(".modal-title").innerHTML = "Thêm sản phẩm";
+  getElement(".modal-title").innerHTML = "Thêm người mượn";
   getElement(".modal-footer").innerHTML = `
     <button class="btn btn-secondary" data-dismiss="modal">Huỷ</button>
     <button class="btn btn-success" onclick="createProduct()">Thêm</button>
