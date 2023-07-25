@@ -30,6 +30,7 @@ function createProduct() {
       display(response.data);
       // Ẩn modal
       $("#myModal").modal("hide");
+      alert("Thêm thành công");
     })
     .catch((error) => {
       console.log(error);
